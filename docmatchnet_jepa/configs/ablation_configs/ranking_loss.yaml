@@ -1,0 +1,11 @@
+project:
+  run_name: "ablation_ranking_loss"
+loss:
+  objective: "ranking"
+  infonce:
+    enabled: false
+  vicreg:
+    enabled: false
+  ranking:
+    enabled: true
+    type: "bpr"

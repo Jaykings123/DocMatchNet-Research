@@ -1,0 +1,4 @@
+project:
+  run_name: "ablation_gate_dim_16"
+model_jepa:
+  gate_dim: 16

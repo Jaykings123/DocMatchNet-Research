@@ -1,0 +1,23 @@
+project:
+  run_name: "docmatchnet_jepa_main"
+
+experiment:
+  mode: "docmatchnet_jepa"
+  tags: ["jepa", "main"]
+
+model_jepa:
+  enabled: true
+  use_gates: true
+  two_stage:
+    enabled: true
+
+model_original:
+  enabled: false
+
+loss:
+  objective: "infonce_vicreg"
+  ranking:
+    enabled: false
+
+training:
+  epochs: 50

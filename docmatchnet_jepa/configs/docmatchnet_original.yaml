@@ -1,0 +1,25 @@
+project:
+  run_name: "docmatchnet_original_main"
+
+experiment:
+  mode: "docmatchnet_original"
+  tags: ["original", "score-space"]
+
+model_jepa:
+  enabled: false
+
+model_original:
+  enabled: true
+
+loss:
+  objective: "ranking"
+  infonce:
+    enabled: false
+  vicreg:
+    enabled: false
+  ranking:
+    enabled: true
+    type: "bpr"
+
+training:
+  epochs: 50

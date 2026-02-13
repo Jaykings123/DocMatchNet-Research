@@ -1,0 +1,4 @@
+project:
+  run_name: "ablation_no_gates"
+model_jepa:
+  use_gates: false

@@ -1,0 +1,7 @@
+project:
+  run_name: "ablation_no_twostage"
+model_jepa:
+  two_stage:
+    enabled: false
+training:
+  epochs: 50

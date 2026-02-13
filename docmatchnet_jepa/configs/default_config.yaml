@@ -1,0 +1,58 @@
+# Model Architecture
+model:
+  embedding_dim: 384          # MiniLM output dimension
+  latent_dim: 256             # JEPA latent space dimension
+  gate_dim: 32                # Gate output dimension
+  n_attention_heads: 4        # Cross-attention heads
+  dropout: 0.1
+
+# Training - Stage 1 (Alignment Pretraining)
+stage1:
+  epochs: 30
+  batch_size: 256
+  learning_rate: 5e-4
+  weight_decay: 1e-5
+  warmup_steps: 500
+
+# Training - Stage 2 (Gated SFT)
+stage2:
+  epochs: 50
+  batch_size: 128
+  learning_rate: 1e-4
+  doctor_encoder_lr_multiplier: 0.05  # Key JEPA insight
+  warmup_steps: 200
+  patience: 10
+
+# Loss weights
+loss:
+  lambda_infonce: 1.0
+  lambda_gate_vicreg: 0.05
+  lambda_ranking: 0.3         # Optional ranking loss
+  infonce_temperature: 0.07   # Learnable
+
+# Data
+data:
+  n_doctors: 500
+  n_cases: 15000
+  doctors_per_case: 100       # Top 50 + 50 random
+  train_ratio: 0.7
+  val_ratio: 0.15
+  test_ratio: 0.15
+
+# Context categories distribution
+contexts:
+  routine: 0.60
+  complex: 0.15
+  rare_disease: 0.10
+  emergency: 0.10
+  pediatric: 0.05
+
+# Reproducibility
+seed: 42
+num_runs: 3                   # For confidence intervals
+seeds: [42, 123, 456]
+
+# Hardware
+device: cuda
+mixed_precision: true
+num_workers: 4

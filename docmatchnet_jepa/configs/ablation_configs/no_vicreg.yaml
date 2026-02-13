@@ -1,0 +1,6 @@
+project:
+  run_name: "ablation_no_vicreg"
+loss:
+  objective: "infonce_vicreg"
+  vicreg:
+    enabled: false

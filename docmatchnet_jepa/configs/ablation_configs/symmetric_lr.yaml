@@ -1,0 +1,9 @@
+project:
+  run_name: "ablation_symmetric_lr"
+optimization:
+  symmetric_lr: true
+  lr:
+    encoder: 1.0e-3
+    predictor: 1.0e-3
+    scorer: 1.0e-3
+    gate: 1.0e-3

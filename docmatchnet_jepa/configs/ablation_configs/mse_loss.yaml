@@ -1,0 +1,11 @@
+project:
+  run_name: "ablation_mse_loss"
+loss:
+  objective: "mse"
+  infonce:
+    enabled: false
+  vicreg:
+    enabled: false
+  mse:
+    enabled: true
+    weight: 1.0

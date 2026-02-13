@@ -1,0 +1,398 @@
+\documentclass[journal]{IEEEtran}
+
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{hyperref}
+\usepackage{algorithmic}
+\usepackage{algorithm}
+\usepackage{subcaption}
+
+\title{DocMatchNet-JEPA: Joint Embedding Predictive Architecture \\
+for Context-Aware Doctor-Patient Matching}
+
+\author{[Your Name]%
+\thanks{[Your Affiliation], [Your Email].}}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Effective doctor-patient matching in digital healthcare platforms
+requires balancing clinical expertise, past performance, logistics,
+and trust factors---a task typically handled by fixed-weight
+multi-criteria scoring systems that cannot adapt to varying clinical
+contexts. We present DocMatchNet-JEPA, a novel architecture that
+adapts Joint Embedding Predictive Architecture (JEPA) principles
+for healthcare recommendation. Instead of predicting scalar match
+scores, our model predicts the embedding of an ideal doctor in
+latent space and computes match quality through embedding similarity.
+Combined with context-aware gating mechanisms inspired by LSTM
+memory cells, DocMatchNet-JEPA dynamically adjusts the importance
+of clinical, past work, logistics, and trust dimensions based on
+case urgency, complexity, and disease rarity. Trained with a
+two-stage strategy---alignment pretraining followed by gated
+supervised fine-tuning---with bi-directional InfoNCE loss, our
+approach achieves [X.XXX] NDCG@5, outperforming rule-based scoring
+by [XX.X]\% and standard neural scoring by [XX.X]\% on a
+comprehensive synthetic benchmark. Notably, DocMatchNet-JEPA
+demonstrates superior sample efficiency, reaching equivalent
+performance with [XX]\% fewer training samples. Analysis of learned
+gate activations reveals clinically meaningful patterns: emergency
+cases amplify clinical expertise matching while rare disease cases
+elevate past research relevance.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Healthcare recommendation, joint embedding prediction,
+context-aware gating, doctor-patient matching,
+neural ranking, multi-criteria decision
+\end{IEEEkeywords}
+
+% ============================================================
+\section{Introduction}
+% ============================================================
+
+Digital healthcare platforms face a critical challenge in matching
+patients with appropriate medical practitioners. Unlike general
+recommendation systems that primarily optimize for user preferences,
+healthcare matching must simultaneously consider clinical expertise
+alignment, physician track record, logistical constraints, and trust
+signals---while adapting these priorities to the specific clinical
+context of each case.
+
+Existing approaches predominantly rely on static multi-criteria
+decision analysis (MCDA) frameworks with fixed weights assigned to
+each matching dimension. While clinically grounded, these systems
+cannot adapt their scoring priorities: an emergency cardiac case
+and a routine dermatology consultation receive the same dimensional
+weighting despite fundamentally different matching requirements.
+
+We address this limitation by introducing DocMatchNet-JEPA, which
+makes two key innovations: (1) embedding-space prediction inspired
+by Joint Embedding Predictive Architectures (JEPA), where the model
+predicts the representation of an ideal doctor rather than a scalar
+score; and (2) context-aware gating mechanisms that dynamically
+adjust dimension importance based on case characteristics.
+
+Our contributions are:
+\begin{itemize}
+\item We adapt JEPA-style embedding prediction for healthcare
+recommendation, demonstrating that predicting in latent space
+outperforms score-space prediction.
+\item We introduce context-aware gates that produce clinically
+interpretable activation patterns, varying systematically across
+emergency, routine, rare disease, and complex cases.
+\item We propose a two-stage training strategy combining alignment
+pretraining with gated supervised fine-tuning, achieving superior
+sample efficiency.
+\item We provide comprehensive experimental evaluation including
+ablation studies, sample efficiency analysis, and clinical
+interpretability assessment.
+\end{itemize}
+
+% ============================================================
+\section{Related Work}
+% ============================================================
+
+\subsection{Healthcare Recommendation Systems}
+[Cite: doctor recommendation systems, health information retrieval,
+clinical decision support]
+
+\subsection{Multi-Criteria Decision Analysis in Medicine}
+[Cite: MCDA frameworks, AHP for healthcare, TOPSIS applications]
+
+\subsection{Neural Ranking and Recommendation}
+[Cite: deep learning for ranking, DIN, cross-encoders,
+bi-encoders, knowledge distillation in RecSys]
+
+\subsection{Joint Embedding Predictive Architectures}
+[Cite: I-JEPA, V-JEPA, VL-JEPA, CLIP, contrastive learning]
+
+\subsection{Gating Mechanisms Beyond Sequential Models}
+[Cite: LSTM gates, GRU, gating in non-sequential contexts,
+mixture of experts, attention as gating]
+
+% ============================================================
+\section{Methodology}
+% ============================================================
+
+\subsection{Problem Formulation}
+
+Given a patient case $\mathbf{x}$ with symptoms, medical history,
+and contextual information, and a set of doctors
+$\mathcal{D} = \{d_1, \ldots, d_N\}$ with professional profiles,
+we seek a scoring function $f(\mathbf{x}, d_i) \rightarrow \mathbb{R}$
+that ranks doctors by match quality.
+
+Each doctor-patient pair is characterized by four feature dimensions:
+\begin{itemize}
+\item Clinical features $\mathbf{c} \in \mathbb{R}^4$: specialty match,
+embedding similarity
+\item Past work features $\mathbf{p} \in \mathbb{R}^5$: publications,
+experience, performance
+\item Logistics features $\mathbf{l} \in \mathbb{R}^5$: availability,
+proximity, fee compatibility
+\item Trust features $\mathbf{t} \in \mathbb{R}^3$: verification,
+profile completeness, reviews
+\end{itemize}
+
+Additionally, case context features
+$\mathbf{z} \in \mathbb{R}^8$ capture urgency, complexity,
+and patient demographics.
+
+\subsection{DocMatchNet-JEPA Architecture}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/fig1_architecture.pdf}
+\caption{DocMatchNet-JEPA Architecture. The model encodes patient
+cases and doctor profiles into a shared latent space, applies
+context-aware gates to modulate feature importance, and predicts
+the embedding of an ideal doctor. Match score is computed as
+similarity between predicted and actual doctor embeddings.}
+\label{fig:architecture}
+\end{figure*}
+
+\subsubsection{Patient and Doctor Encoders}
+
+The patient encoder $E_x$ maps patient case embeddings to the
+latent space:
+\begin{equation}
+\mathbf{h}_x = E_x(\mathbf{e}_x) = \mathrm{LayerNorm}(\mathrm{MLP}(\mathbf{e}_x))
+\end{equation}
+where $\mathbf{e}_x \in \mathbb{R}^{384}$ is the sentence
+embedding of the symptom description.
+
+Similarly, the doctor encoder $E_y$ maps doctor embeddings:
+\begin{equation}
+\mathbf{h}_y = E_y(\mathbf{e}_y) = \mathrm{LayerNorm}(\mathrm{MLP}(\mathbf{e}_y))
+\end{equation}
+
+Following VL-JEPA~\cite{vljepa2024}, we train the doctor encoder
+with a reduced learning rate ($0.05\times$) to stabilize the
+target representation space.
+
+\subsubsection{Context-Aware Gates}
+
+Inspired by LSTM memory cells, we introduce four gate networks
+that modulate dimension importance based on patient context:
+\begin{equation}
+\mathbf{g}_k = \sigma(\mathbf{W}_{g_k}[\mathbf{h}_x; \mathbf{z}] + \mathbf{b}_{g_k})
+\end{equation}
+where $k \in \{\text{clinical}, \text{pastwork}, \text{logistics}, \text{trust}\}$,
+$\sigma$ is the sigmoid function, and $[\cdot;\cdot]$ denotes
+concatenation. Gate biases are initialized from MCDA weights.
+
+Each dimension's encoded features are modulated:
+\begin{equation}
+\tilde{\mathbf{f}}_k = \mathbf{g}_k \odot \mathrm{Enc}_k(\mathbf{f}_k)
+\end{equation}
+
+\subsubsection{Predictor}
+
+The predictor network takes the patient latent representation
+and gated features to predict the ideal doctor embedding:
+\begin{equation}
+\hat{\mathbf{h}}_y = P([\mathbf{h}_x; \tilde{\mathbf{f}}_{\text{clinical}};
+\tilde{\mathbf{f}}_{\text{pastwork}}; \tilde{\mathbf{f}}_{\text{logistics}};
+\tilde{\mathbf{f}}_{\text{trust}}])
+\end{equation}
+
+\subsubsection{Score Computation}
+
+The match score is the cosine similarity between the predicted
+ideal and actual doctor embeddings in the projection space:
+\begin{equation}
+s(x, d) = \frac{\pi(\hat{\mathbf{h}}_y) \cdot \pi_d(\mathbf{h}_y)}
+{\|\pi(\hat{\mathbf{h}}_y)\| \cdot \|\pi_d(\mathbf{h}_y)\|}
+\end{equation}
+where $\pi$ and $\pi_d$ are projection heads.
+
+\subsection{Training Objective}
+
+\subsubsection{Bi-directional InfoNCE Loss}
+
+We train with InfoNCE loss that encourages predicted ideal
+embeddings to align with matched doctor embeddings:
+\begin{equation}
+\mathcal{L}_{\text{InfoNCE}} = -\frac{1}{2}\left(
+\frac{1}{B}\sum_{i=1}^{B} \log\frac{e^{s_{ii}/\tau}}{\sum_j e^{s_{ij}/\tau}} +
+\frac{1}{B}\sum_{i=1}^{B} \log\frac{e^{s_{ii}/\tau}}{\sum_j e^{s_{ji}/\tau}}
+\right)
+\end{equation}
+where $\tau$ is a learnable temperature parameter.
+
+\subsubsection{VICReg Gate Regularization}
+
+To prevent gate collapse, we apply VICReg-inspired regularization:
+\begin{equation}
+\mathcal{L}_{\text{gate}} = \sum_k \left(\mathrm{ReLU}(1 - \mathrm{Var}(\mathbf{g}_k)) +
+\lambda_{\text{cov}} \|\mathrm{Cov}(\mathbf{g}_k)\|_F^2\right)
+\end{equation}
+
+The total loss is:
+\begin{equation}
+\mathcal{L} = \mathcal{L}_{\text{InfoNCE}} + \lambda_g \mathcal{L}_{\text{gate}}
+\end{equation}
+
+\subsection{Two-Stage Training}
+
+\textbf{Stage 1 (Alignment Pretraining):} Gates are frozen at
+initial values. Only encoders, predictor, and projections are
+trained with InfoNCE loss for 20 epochs.
+
+\textbf{Stage 2 (Gated SFT):} All parameters including gates
+are unfrozen. Full loss with gate regularization is used for
+up to 40 epochs with early stopping on validation NDCG@5.
+
+% ============================================================
+\section{Experimental Setup}
+% ============================================================
+
+\subsection{Dataset}
+
+We construct a comprehensive synthetic benchmark for
+doctor-patient matching evaluation (Table~\ref{tab:dataset}).
+
+\begin{table}[t]
+\centering
+\caption{Dataset Statistics}
+\label{tab:dataset}
+\begin{tabular}{@{}lr@{}}
+\toprule
+\textbf{Characteristic} & \textbf{Value} \\
+\midrule
+Number of doctors & 500 \\
+Number of patient cases & 15,000 \\
+Doctors evaluated per case & 100 \\
+Medical specialties & 42 \\
+Relevance scale & 0--4 \\
+\midrule
+Context distribution: & \\
+\quad Routine & 60\% \\
+\quad Complex & 15\% \\
+\quad Rare disease & 10\% \\
+\quad Emergency & 10\% \\
+\quad Pediatric & 5\% \\
+\midrule
+Train / Val / Test & 70\% / 15\% / 15\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Baselines}
+
+We compare against six baselines: (1) Rule-based static MCDA,
+(2) Simple MLP scorer, (3) Neural Ranker (cross-attention),
+(4) DIN-inspired attention model, (5) DocMatchNet-Original
+(score-space prediction), and (6) DocMatchNet-JEPA-NoGate
+(ablation baseline).
+
+\subsection{Evaluation Metrics}
+
+We report NDCG@\{1,5,10\}, MAP, MRR, and HR@5. All results
+are averaged over 3 runs with different random seeds, with
+statistical significance assessed via Wilcoxon signed-rank test
+with Bonferroni correction.
+
+\subsection{Implementation Details}
+
+All models are implemented in PyTorch and trained on a single
+NVIDIA T4 GPU. Patient and doctor embeddings are computed
+using all-MiniLM-L6-v2 (384 dimensions). Key hyperparameters:
+latent dimension 256, gate dimension 32, InfoNCE temperature
+0.07 (learnable), doctor encoder LR multiplier 0.05,
+$\lambda_g = 0.05$.
+
+% ============================================================
+\section{Results and Analysis}
+% ============================================================
+
+\subsection{Main Results}
+\input{tables/table1}
+
+\subsection{Ablation Study}
+\input{tables/table2}
+
+\subsection{Stratified Performance}
+\input{tables/table3}
+
+\subsection{Gate Behavior Analysis}
+\input{tables/table4}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/fig3_gate_heatmap.pdf}
+\caption{Context-aware gate activation patterns across clinical
+scenarios. Emergency cases amplify clinical and logistics gates,
+while rare disease cases elevate past work gates.}
+\label{fig:gate_heatmap}
+\end{figure}
+
+\subsection{Sample Efficiency}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/fig2_sample_efficiency.pdf}
+\caption{Sample efficiency comparison. DocMatchNet-JEPA achieves
+equivalent performance with fewer training samples.}
+\label{fig:sample_efficiency}
+\end{figure}
+
+\subsection{Embedding Space Analysis}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/fig4_embedding_tsne.pdf}
+\caption{t-SNE visualization of the learned embedding space.}
+\label{fig:tsne}
+\end{figure*}
+
+\subsection{Clinical Case Studies}
+
+[Detailed case analysis from case\_studies.json]
+
+% ============================================================
+\section{Discussion}
+% ============================================================
+
+\subsection{Why Embedding Prediction Outperforms Score Prediction}
+
+[Discuss the theoretical and empirical advantages]
+
+\subsection{Clinical Implications of Gate Patterns}
+
+[Discuss what the gate patterns mean clinically]
+
+\subsection{Limitations}
+
+\begin{itemize}
+\item Synthetic data: While carefully designed, real clinical
+validation is needed.
+\item Single embedding model: Results may vary with different
+pre-trained embeddings.
+\item Computational overhead: Two-stage training requires more
+GPU time than single-stage approaches.
+\end{itemize}
+
+% ============================================================
+\section{Conclusion}
+% ============================================================
+
+We presented DocMatchNet-JEPA, a novel architecture that adapts
+joint embedding prediction with context-aware gating for
+doctor-patient matching. Our experiments demonstrate that
+embedding-space prediction outperforms score-space prediction,
+context-aware gates produce clinically meaningful activation
+patterns, and the two-stage training strategy yields superior
+sample efficiency. Future work includes validation on real
+clinical data, extension to multi-turn consultations, and
+integration of patient feedback signals.
+
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\end{document}
