@@ -1,0 +1,21 @@
+\begin{table}[t]
+\centering
+\caption{Computational Efficiency Comparison}
+\label{tab:efficiency}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+\textbf{Method} & \textbf{Params} & \textbf{GPU (ms)} & \textbf{CPU (ms)} & \textbf{Train (h)} \\
+\midrule
+Rule-Based MCDA & 0     & $<$1 & $<$1 & 0   \\
+Simple MLP      & 50K   & $<$1 & $<$1 & 0.2 \\
+Neural Ranker   & 350K  & 2    & 8    & 1.0 \\
+DIN             & 120K  & 1    & 5    & 0.8 \\
+DocMatchNet-Orig & 450K & 3    & 12   & 1.5 \\
+DocMatchNet-JEPA & 520K & 3    & 14   & 2.5 \\
+\bottomrule
+\end{tabular}%
+}
+\vspace{1mm}
+\footnotesize{Latency per doctor-patient pair. Training on NVIDIA T4.}
+\end{table}

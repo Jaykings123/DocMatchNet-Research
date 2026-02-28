@@ -1,0 +1,25 @@
+\begin{table}[t]
+\centering
+\caption{Ablation Study: Component Contribution Analysis}
+\label{tab:ablation}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{@{}lccc|c@{}}
+\toprule
+\textbf{Variant} & \textbf{NDCG@5} & \textbf{MAP} & \textbf{MRR} & \textbf{$\Delta$N@5} \\
+\midrule
+JEPA (Full) & .479$\pm$.009 & .915$\pm$.010 & .970$\pm$.019 & -- \\
+\midrule
+\quad w/o Gates & .478$\pm$.006 & .910$\pm$.005 & .964$\pm$.018 & $-$.001 \\
+\quad w/o Two-Stage & .514$\pm$.038 & .892$\pm$.006 & .961$\pm$.009 & +.035 \\
+\quad w/ MSE Loss & .446$\pm$.006 & .877$\pm$.001 & .959$\pm$.015 & $-$.033 \\
+\quad w/ Pairwise Loss & .658$\pm$.150 & .930$\pm$.014 & .982$\pm$.025 & +.179 \\
+\quad w/ Symmetric LR & .453$\pm$.013 & .912$\pm$.003 & .974$\pm$.007 & $-$.026 \\
+\quad w/o VICReg Reg & .479$\pm$.009 & .915$\pm$.010 & .970$\pm$.020 & +.000 \\
+\quad gate\_dim\,=\,16 & .508$\pm$.011 & .907$\pm$.004 & .977$\pm$.007 & +.029 \\
+\quad gate\_dim\,=\,64 & .483$\pm$.026 & .924$\pm$.010 & .981$\pm$.002 & +.004 \\
+\bottomrule
+\end{tabular}%
+}
+\vspace{1mm}
+\footnotesize{3-seed avg$\pm$std. $\Delta$N@5 = change vs.\ full model.}
+\end{table}

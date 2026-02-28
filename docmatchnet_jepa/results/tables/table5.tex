@@ -1,0 +1,18 @@
+\begin{table}[t]
+\centering
+\caption{Sample Efficiency: NDCG@5 vs Training Data Size}
+\label{tab:sample_efficiency}
+\begin{tabular}{@{}rcccc@{}}
+\toprule
+\textbf{\# Samples} & \textbf{MCDA} & \textbf{Neural Ranker} & \textbf{DocMatch-Orig} & \textbf{DocMatch-JEPA} \\
+\midrule
+100 & \textbf{0.890} & 0.454 & 0.706 & 0.410 \\
+250 & \textbf{0.890} & 0.471 & 0.742 & 0.452 \\
+500 & \textbf{0.890} & 0.500 & 0.762 & 0.476 \\
+1,000 & \textbf{0.890} & 0.573 & 0.774 & 0.491 \\
+2,500 & 0.890 & \textbf{0.949} & 0.794 & 0.482 \\
+5,000 & 0.890 & \textbf{0.963} & 0.892 & 0.491 \\
+10,500 & 0.890 & \textbf{0.968} & 0.907 & 0.512 \\
+\bottomrule
+\end{tabular}
+\end{table}

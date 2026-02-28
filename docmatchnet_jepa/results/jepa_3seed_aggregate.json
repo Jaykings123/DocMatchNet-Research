@@ -1,0 +1,81 @@
+{
+  "model": "DocMatchNet-JEPA",
+  "n_runs": 3,
+  "seeds": [
+    42,
+    123,
+    456
+  ],
+  "overall": {
+    "ndcg@10": {
+      "mean": 0.588130067707621,
+      "std": 0.007487133713591733,
+      "runs": [
+        0.5951900811313994,
+        0.5777661079149846,
+        0.5914340140764792
+      ]
+    },
+    "ndcg@5": {
+      "mean": 0.568008883742618,
+      "std": 0.0004313187673008525,
+      "runs": [
+        0.5686109197847268,
+        0.5676229053099564,
+        0.5677928261331712
+      ]
+    }
+  },
+  "stratified": {
+    "complex": {
+      "mean": 0.6168939497426914,
+      "std": 0.004151633634736432,
+      "runs": [
+        0.6223174524159887,
+        0.6122345570581131,
+        0.6161298397539723
+      ]
+    },
+    "emergency": {
+      "mean": 0.5533717247530504,
+      "std": 0.013044902055250232,
+      "runs": [
+        0.5585118886595496,
+        0.5354576459050101,
+        0.5661456396945918
+      ]
+    },
+    "pediatric": {
+      "mean": 0.777532828337539,
+      "std": 0.1112386434734823,
+      "runs": [
+        0.6988173065881585,
+        0.9348480123763645,
+        0.6989331660480941
+      ]
+    },
+    "rare_disease": {
+      "mean": 0.5725947926482453,
+      "std": 0.007186676308487667,
+      "runs": [
+        0.5824577957432776,
+        0.5697877562110581,
+        0.5655388259904003
+      ]
+    },
+    "routine": {
+      "mean": 0.5399152000299091,
+      "std": 0.006491151906487282,
+      "runs": [
+        0.5435786453173445,
+        0.5307939673835151,
+        0.5453729873888674
+      ]
+    }
+  },
+  "files": [
+    "/kaggle/input/datasets/jayviramgami/docmatchnet-jepa-results/results/JEPA_seed_42/jepa_seed42_results.json",
+    "/kaggle/input/datasets/jayviramgami/docmatchnet-jepa-results/results/JEPA_seed_123/jepa_seed123_results.json",
+    "/kaggle/input/datasets/jayviramgami/docmatchnet-jepa-results/results/JEPA_seed_456/jepa_seed456_results.json"
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "emergency": {
+    "case_idx": 1571,
+    "context": "emergency",
+    "gate_activations": {
+      "clinical": 0.6002970933914185,
+      "pastwork": 0.5571078062057495,
+      "logistics": 0.4953562021255493,
+      "trust": 0.4357266128063202
+    },
+    "jepa_ndcg5": 0.5129606334703583,
+    "mcda_ndcg5": 0.7954312707352876,
+    "improvement_pct": -35.51163345688141
+  },
+  "rare_disease": {
+    "case_idx": 2243,
+    "context": "rare_disease",
+    "gate_activations": {
+      "clinical": 0.5990273952484131,
+      "pastwork": 0.5564558506011963,
+      "logistics": 0.49289941787719727,
+      "trust": 0.43629002571105957
+    },
+    "jepa_ndcg5": 0.5458046538551236,
+    "mcda_ndcg5": 0.8521208387439743,
+    "improvement_pct": -35.94750544304968
+  },
+  "routine": {
+    "case_idx": 1562,
+    "context": "routine",
+    "gate_activations": {
+      "clinical": 0.5984643697738647,
+      "pastwork": 0.5561007261276245,
+      "logistics": 0.49368977546691895,
+      "trust": 0.4372749328613281
+    },
+    "jepa_ndcg5": 0.34391562196792846,
+    "mcda_ndcg5": 0.8079708722254751,
+    "improvement_pct": -57.434650952125644
+  },
+  "complex": {
+    "case_idx": 291,
+    "context": "complex",
+    "gate_activations": {
+      "clinical": 0.6003015041351318,
+      "pastwork": 0.5541699528694153,
+      "logistics": 0.4955359399318695,
+      "trust": 0.43724799156188965
+    },
+    "jepa_ndcg5": 0.8858739921415852,
+    "mcda_ndcg5": 1.0,
+    "improvement_pct": -11.412600785841477
+  }
+}

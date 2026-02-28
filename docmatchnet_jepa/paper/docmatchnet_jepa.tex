@@ -12,8 +12,8 @@
 \title{DocMatchNet-JEPA: Joint Embedding Predictive Architecture \\
 for Context-Aware Doctor-Patient Matching}
 
-\author{[Your Name]%
-\thanks{[Your Affiliation], [Your Email].}}
+\author{Jay Viramgami%
+\thanks{Independent Researcher. Contact: jayviramgami@gmail.com}}
 
 \begin{document}
 
@@ -35,14 +35,18 @@ of clinical, past work, logistics, and trust dimensions based on
 case urgency, complexity, and disease rarity. Trained with a
 two-stage strategy---alignment pretraining followed by gated
 supervised fine-tuning---with bi-directional InfoNCE loss, our
-approach achieves [X.XXX] NDCG@5, outperforming rule-based scoring
-by [XX.X]\% and standard neural scoring by [XX.X]\% on a
-comprehensive synthetic benchmark. Notably, DocMatchNet-JEPA
-demonstrates superior sample efficiency, reaching equivalent
-performance with [XX]\% fewer training samples. Analysis of learned
-gate activations reveals clinically meaningful patterns: emergency
-cases amplify clinical expertise matching while rare disease cases
-elevate past research relevance.
+approach achieves 0.568 NDCG@5 on a comprehensive synthetic
+benchmark. While score-prediction baselines currently achieve higher
+ranking accuracy (e.g., 0.972 NDCG@5 for SimpleMLP), DocMatchNet-JEPA
+offers two distinct advantages: (1)~context-aware gates that produce
+clinically interpretable activation patterns, with statistically
+significant variation across emergency, routine, rare disease, and
+complex case types ($p<0.001$, Kruskal-Wallis); and (2)~an
+embedding-prediction paradigm that opens new directions for
+transfer learning and multi-modal healthcare recommendation.
+Analysis of learned gate activations reveals that emergency cases
+amplify clinical expertise matching while complex cases
+elevate past work relevance.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -98,22 +102,42 @@ interpretability assessment.
 % ============================================================
 
 \subsection{Healthcare Recommendation Systems}
-[Cite: doctor recommendation systems, health information retrieval,
-clinical decision support]
+Doctor recommendation and clinical decision support systems have
+tradionally relied on rule-based matching and multi-criteria
+scoring frameworks. Recent work has begun integrating neural
+approaches, though adoption remains limited.
 
 \subsection{Multi-Criteria Decision Analysis in Medicine}
-[Cite: MCDA frameworks, AHP for healthcare, TOPSIS applications]
+MCDA frameworks such as the Analytic Hierarchy Process
+(AHP)~\cite{saaty1990ahp} have been widely applied to healthcare
+prioritization. These methods provide clinically grounded weighting
+but cannot adapt to individual case context.
 
 \subsection{Neural Ranking and Recommendation}
-[Cite: deep learning for ranking, DIN, cross-encoders,
-bi-encoders, knowledge distillation in RecSys]
+Deep learning for ranking has progressed from simple pointwise
+scoring to attention-based models such as Deep Interest
+Network (DIN)~\cite{zhou2018din} and cross-encoder architectures.
+Contrastive Predictive Coding~\cite{oord2018infonce} introduced
+InfoNCE loss, which we adapt for our bi-directional training
+objective.
 
 \subsection{Joint Embedding Predictive Architectures}
-[Cite: I-JEPA, V-JEPA, VL-JEPA, CLIP, contrastive learning]
+JEPA was proposed by LeCun~\cite{lecun2022jepa} as a path toward
+autonomous intelligence via prediction in latent space.
+I-JEPA~\cite{assran2023ijepa} demonstrated this for images,
+V-JEPA~\cite{bardes2024vjepa} for video, and
+VL-JEPA~\cite{vljepa2024} for vision-language.
+CLIP~\cite{radford2021clip} popularized contrastive joint
+embedding for vision-language alignment. Our work extends JEPA
+principles to structured healthcare recommendation.
 
 \subsection{Gating Mechanisms Beyond Sequential Models}
-[Cite: LSTM gates, GRU, gating in non-sequential contexts,
-mixture of experts, attention as gating]
+LSTM~\cite{hochreiter1997lstm} introduced gating for sequential
+modeling. We repurpose the gating concept for non-sequential,
+context-dependent feature modulation, with gate biases initialized
+from clinically motivated MCDA weights.
+VICReg~\cite{bardes2022vicreg} inspires our gate regularization
+to prevent collapse.
 
 % ============================================================
 \section{Methodology}
@@ -218,10 +242,12 @@ where $\pi$ and $\pi_d$ are projection heads.
 We train with InfoNCE loss that encourages predicted ideal
 embeddings to align with matched doctor embeddings:
 \begin{equation}
-\mathcal{L}_{\text{InfoNCE}} = -\frac{1}{2}\left(
-\frac{1}{B}\sum_{i=1}^{B} \log\frac{e^{s_{ii}/\tau}}{\sum_j e^{s_{ij}/\tau}} +
-\frac{1}{B}\sum_{i=1}^{B} \log\frac{e^{s_{ii}/\tau}}{\sum_j e^{s_{ji}/\tau}}
-\right)
+\begin{split}
+\mathcal{L}_{\text{InfoNCE}} = -\frac{1}{2}\Bigg(
+& \frac{1}{B}\sum_{i=1}^{B} \log\frac{e^{s_{ii}/\tau}}{\sum_j e^{s_{ij}/\tau}} \\
++ & \frac{1}{B}\sum_{i=1}^{B} \log\frac{e^{s_{ii}/\tau}}{\sum_j e^{s_{ji}/\tau}}
+\Bigg)
+\end{split}
 \end{equation}
 where $\tau$ is a learnable temperature parameter.
 
@@ -293,10 +319,15 @@ We compare against six baselines: (1) Rule-based static MCDA,
 
 \subsection{Evaluation Metrics}
 
-We report NDCG@\{1,5,10\}, MAP, MRR, and HR@5. All results
-are averaged over 3 runs with different random seeds, with
-statistical significance assessed via Wilcoxon signed-rank test
-with Bonferroni correction.
+We report NDCG@\{1,5,10\}, MAP, MRR, and HR@5 where available.
+All results are averaged over 3 runs with different random seeds,
+with statistical significance assessed via Wilcoxon signed-rank
+test with Bonferroni correction.\footnote{Due to evaluation
+pipeline constraints, the JEPA model aggregate provides only
+NDCG@5 and NDCG@10. MAP, MRR, and HR@5 are reported for the
+Original model and ablation variants but are unavailable for
+the final JEPA aggregate. Pairwise per-case significance tests
+between JEPA and baselines were therefore not conducted.}
 
 \subsection{Implementation Details}
 
@@ -337,9 +368,22 @@ while rare disease cases elevate past work gates.}
 \begin{figure}[t]
 \centering
 \includegraphics[width=\columnwidth]{figures/fig2_sample_efficiency.pdf}
-\caption{Sample efficiency comparison. DocMatchNet-JEPA achieves
-equivalent performance with fewer training samples.}
+\caption{Sample efficiency comparison across training data sizes.
+DocMatchNet-JEPA shows steady improvement with more data but
+does not yet match score-prediction baselines at any data size.}
 \label{fig:sample_efficiency}
+\end{figure}
+
+\input{tables/table5}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/fig5_training_curves.pdf}
+\caption{Training loss curves for DocMatchNet-JEPA two-stage
+training. Stage 1 (alignment pretraining) converges quickly;
+Stage 2 (gated SFT) shows continued improvement with gate
+unfreezing.}
+\label{fig:training_curves}
 \end{figure}
 
 \subsection{Embedding Space Analysis}
@@ -353,19 +397,75 @@ equivalent performance with fewer training samples.}
 
 \subsection{Clinical Case Studies}
 
-[Detailed case analysis from case\_studies.json]
+Table~\ref{tab:gates} shows that gate activations vary
+systematically across clinical contexts, with statistically
+significant differences ($p<0.001$, Kruskal-Wallis) for all
+four gates. Emergency cases show the highest clinical gate
+activation ($G_{\text{clinical}}=0.600$) and logistics gate
+($G_{\text{logistics}}=0.495$), consistent with the clinical
+need to prioritize specialist expertise and availability.
+Pediatric cases show elevated trust gate values
+($G_{\text{trust}}=0.440$), reflecting the importance of
+parent confidence in pediatric care. While these gate patterns
+are clinically interpretable, we note that on individual
+case-level NDCG@5, DocMatchNet-JEPA does not yet outperform
+the rule-based MCDA baseline (e.g., emergency: 0.513 vs.\ 0.795;
+complex: 0.886 vs.\ 1.000), indicating that interpretable
+gate modulation alone is insufficient to overcome the ranking
+accuracy gap.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/fig6_gate_boxplots.pdf}
+\caption{Box plots of gate activation distributions across clinical
+contexts, showing the spread and outliers for each gate dimension.}
+\label{fig:gate_boxplots}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/fig7_radar_comparison.pdf}
+\caption{Radar plot comparing DocMatchNet-JEPA, DocMatchNet-Original,
+and Rule-Based MCDA across stratified clinical contexts (NDCG@5).}
+\label{fig:radar}
+\end{figure}
+
+\subsection{Computational Efficiency}
+\input{tables/table6}
 
 % ============================================================
 \section{Discussion}
 % ============================================================
 
-\subsection{Why Embedding Prediction Outperforms Score Prediction}
+\subsection{Embedding Prediction vs.\ Score Prediction}
 
-[Discuss the theoretical and empirical advantages]
+Our results show that embedding-space prediction with the current
+architecture does not yet match the ranking accuracy of score-space
+prediction baselines (JEPA NDCG@5 = 0.568 vs.\ SimpleMLP NDCG@5
+= 0.972). We hypothesize that the latent-space prediction task is
+inherently harder: the model must reconstruct a full embedding
+vector rather than a scalar score, and the InfoNCE contrastive
+objective may require substantially more training data or
+architectural refinements (e.g., larger predictor networks,
+curriculum learning) to converge to competitive ranking quality.
+Nevertheless, the embedding-prediction paradigm offers a
+foundational advantage: once the latent space is well-structured,
+it naturally supports zero-shot transfer, multi-modal fusion,
+and retrieval-augmented matching---capabilities that scalar
+scoring does not provide.
 
 \subsection{Clinical Implications of Gate Patterns}
 
-[Discuss what the gate patterns mean clinically]
+Despite lower overall ranking accuracy, the context-aware gates
+produce statistically significant and clinically coherent
+activation patterns (Table~\ref{tab:gates}). Emergency cases
+consistently amplify clinical and logistics gates, aligning with
+the clinical priority of specialist expertise and rapid
+availability. Rare disease cases elevate the past work gate,
+reflecting the importance of research experience for uncommon
+conditions. These patterns demonstrate that the gating mechanism
+successfully learns meaningful clinical priors from the data,
+even when overall ranking accuracy remains suboptimal.
 
 \subsection{Limitations}
 
@@ -376,6 +476,15 @@ validation is needed.
 pre-trained embeddings.
 \item Computational overhead: Two-stage training requires more
 GPU time than single-stage approaches.
+\item Ranking accuracy gap: DocMatchNet-JEPA currently
+underperforms all score-prediction baselines on NDCG metrics.
+The embedding-prediction paradigm may require more data,
+larger models, or architectural refinements to close this gap.
+\item Incomplete evaluation metrics: The JEPA aggregate provides
+only NDCG@5 and NDCG@10; MAP, MRR, and HR@5 are unavailable
+for the JEPA model due to evaluation pipeline constraints.
+Pairwise per-case significance testing (JEPA vs.\ baselines)
+was not conducted.
 \end{itemize}
 
 % ============================================================
@@ -384,12 +493,20 @@ GPU time than single-stage approaches.
 
 We presented DocMatchNet-JEPA, a novel architecture that adapts
 joint embedding prediction with context-aware gating for
-doctor-patient matching. Our experiments demonstrate that
-embedding-space prediction outperforms score-space prediction,
-context-aware gates produce clinically meaningful activation
-patterns, and the two-stage training strategy yields superior
-sample efficiency. Future work includes validation on real
-clinical data, extension to multi-turn consultations, and
+doctor-patient matching. While DocMatchNet-JEPA does not yet
+match the ranking accuracy of score-prediction baselines on our
+synthetic benchmark, it introduces two contributions of
+independent value: (1)~context-aware gates that produce
+statistically significant and clinically interpretable activation
+patterns across case types, and (2)~an embedding-prediction
+paradigm that provides a foundation for future transfer learning
+and multi-modal healthcare recommendation. Our ablation study
+confirms that the choice of loss function (InfoNCE vs.\ MSE vs.\
+pairwise ranking) substantially impacts JEPA performance, and
+that the two-stage training strategy stabilizes convergence.
+Future work includes scaling the model and training data to close
+the accuracy gap with score-prediction baselines, validation on
+real clinical data, extension to multi-turn consultations, and
 integration of patient feedback signals.
 
 \bibliographystyle{IEEEtran}

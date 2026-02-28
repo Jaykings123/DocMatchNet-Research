@@ -33,6 +33,14 @@ env/
 # *.pt
 # *.pth
 
+# LaTeX build artifacts
+*.aux
+*.bbl
+*.blg
+*.fls
+*.fdb_latexmk
+*.out
+
 # Logs
 *.log
 wandb/

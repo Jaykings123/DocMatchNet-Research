@@ -1,0 +1,18 @@
+\begin{table}[t]
+\centering
+\caption{Main Results: Doctor-Patient Matching Performance}
+\label{tab:main_results}
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+\textbf{Method} & \textbf{NDCG@1} & \textbf{NDCG@5} & \textbf{NDCG@10} & \textbf{MAP} & \textbf{MRR} & \textbf{HR@5} \\
+\midrule
+Rule-Based MCDA & -- & 0.890 & 0.878 & -- & -- & -- \\
+Simple MLP & -- & \textbf{0.972} & \textbf{0.971} & -- & -- & -- \\
+Neural Ranker & -- & \underline{0.967} & \underline{0.964} & -- & -- & -- \\
+DIN & -- & 0.954 & 0.953 & -- & -- & -- \\
+DocMatchNet-Original & \textbf{0.933} & 0.921 & 0.919 & \textbf{0.970} & \textbf{1.000} & \textbf{1.000} \\
+DocMatchNet-JEPA-NoGate & -- & 0.478 & -- & \underline{0.910} & \underline{0.964} & -- \\
+DocMatchNet-JEPA & -- & 0.568 & 0.588 & -- & -- & -- \\
+\bottomrule
+\end{tabular}
+\end{table}

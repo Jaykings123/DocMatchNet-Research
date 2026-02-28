@@ -1,0 +1,20 @@
+\begin{table}[t]
+\centering
+\caption{Mean Gate Activations by Clinical Context}
+\label{tab:gates}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+\textbf{Context} & $G_{\text{clinical}}$ & $G_{\text{pastwork}}$ & $G_{\text{logistics}}$ & $G_{\text{trust}}$ \\
+\midrule
+Routine & 0.599 & 0.555 & 0.493 & 0.437 \\
+Complex & 0.600 & 0.556 & 0.494 & 0.436 \\
+Rare Disease & 0.599 & 0.556 & 0.493 & 0.436 \\
+Emergency & 0.600 & 0.557 & 0.495 & 0.436 \\
+Pediatric & 0.598 & 0.555 & 0.493 & 0.440 \\
+\midrule
+\textit{Kruskal-Wallis $p$} & $<$0.001*** & $<$0.001*** & $<$0.001*** & $<$0.001*** \\
+\bottomrule
+\end{tabular}
+\vspace{2mm}
+\footnotesize{*$p<0.05$, **$p<0.01$, ***$p<0.001$. Kruskal-Wallis test for gate differences across contexts.}
+\end{table}
