@@ -11,12 +11,13 @@ Rule-Based MCDA & -- & 0.890 & 0.878 & -- & -- & -- \\
 Simple MLP & -- & \textbf{0.972} & \textbf{0.971} & -- & -- & -- \\
 Neural Ranker & -- & \underline{0.967} & \underline{0.964} & -- & -- & -- \\
 DIN & -- & 0.954 & 0.953 & -- & -- & -- \\
+\midrule
 DocMatchNet-Orig & \textbf{0.933} & 0.921 & 0.919 & \textbf{0.970} & \textbf{1.000} & \textbf{1.000} \\
-JEPA-NoGate & -- & 0.478 & -- & \underline{0.910} & \underline{0.964} & -- \\
-DocMatchNet-JEPA & -- & 0.568 & 0.588 & -- & -- & -- \\
+JEPA-NoGate & -- & 0.478 & -- & 0.910 & 0.964 & -- \\
+DocMatchNet-JEPA & -- & 0.568 & 0.588 & \underline{0.915} & \underline{0.970} & -- \\
 \bottomrule
 \end{tabular}%
 }
 \vspace{1mm}
-\footnotesize{N@$k$ = NDCG@$k$. Best in \textbf{bold}, second best \underline{underlined}.}
+\footnotesize{N@$k$ = NDCG@$k$. Best in \textbf{bold}, second best \underline{underlined}. ``--'' = metric unavailable for this model.}
 \end{table}
